@@ -29,7 +29,6 @@ jobs:
   ci:
     if: always() && (cancelled() || contains(needs.*.result, 'failure'))
     needs:
-      - skipper
       - helm-ci
       - k8s-ci
     runs-on: ubuntu-latest
