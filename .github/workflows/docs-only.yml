@@ -25,10 +25,12 @@ jobs:
         with:
           fetch-depth: 0
       - id: docs
-        if: ${{ inputs.event-name == 'pull_request' || inputs.event-name == 'merge_group' }}
+        #if: ${{ inputs.event-name == 'pull_request' || inputs.event-name == 'merge_group' }}
         run: |
           echo "B: ${{ inputs.base-ref }}"
           echo "K: ${{ inputs.event-name }}"
+          
+          exit 1
 
           BASE_REF="${{ inputs.base-ref }}"
           BASE_SHA=$(git rev-parse origin/${BASE_REF#refs/heads/})
