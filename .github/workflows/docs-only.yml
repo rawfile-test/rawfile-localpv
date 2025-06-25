@@ -27,9 +27,6 @@ jobs:
       - id: docs
         if: ${{ inputs.event-name == 'pull_request' || inputs.event-name == 'merge_group' }}
         run: |
-          echo "B: ${{ inputs.base-ref }}"
-          echo "K: ${{ inputs.event-name }}"
-          
           BASE_REF="${{ inputs.base-ref }}"
           BASE_SHA=$(git rev-parse origin/${BASE_REF#refs/heads/})
           CHANGED_FILES=$(git diff --name-only $BASE_SHA HEAD)
@@ -47,9 +44,14 @@ jobs:
 
       - id: merge-q
         if: ${{ inputs.event-name == 'merge_group' }}
-        uses: cariad-tech/merge-queue-ci-skipper@main
-        with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BASE_REF="${{ inputs.base-ref }}"
+
+          if git diff --quiet HEAD~1 origin/${BASE_REF#refs/heads/}; then
+            echo "skip-check=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip-check=false" >> $GITHUB_OUTPUT
+          fi
 
       - id: skip
         run: |
