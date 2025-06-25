@@ -13,13 +13,25 @@ on:
 jobs:
   changes:
     uses: ./.github/workflows/docs-only.yml
+  
+  merge-q:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'merge_group' }}
+    outputs:
+      skip: ${{ steps.check.outputs.skip-check }}
+    steps:
+      - id: check
+        uses: cariad-tech/merge-queue-ci-skipper@main
+      - run: |
+          echo "Got: ${{ steps.check.outputs.skip-check }}"
+
   helm-ci:
-    needs: changes
-    if: ${{ github.event_name != 'pull_request' || needs.changes.outputs.docs-only == 'false' }}
+    needs: [changes, merge-q]
+    if: ${{ needs.merge-q.outputs.skip == 'false' && (github.event_name != 'pull_request' || needs.changes.outputs.docs-only == 'false') }}
     uses: ./.github/workflows/helm-chart.yml
   k8s-ci:
     needs: changes
-    if: ${{ github.event_name != 'pull_request' || needs.changes.outputs.docs-only == 'false' }}
+    if: ${{ needs.merge-q.outputs.skip == 'false' && (github.event_name != 'pull_request' || needs.changes.outputs.docs-only == 'false') }}
     uses: ./.github/workflows/k8s.yml
   ci:
     if: ${{ success() }}
