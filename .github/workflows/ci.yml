@@ -27,10 +27,18 @@ jobs:
     uses: ./.github/workflows/k8s.yml
 
   ci:
+    if: ${{ always() }}
     needs:
       - helm-ci
       - k8s-ci
     runs-on: ubuntu-latest
     steps:
+      - name: CI succeeded
+        if: ${{ ! failure() && ! cancelled() }}
+        run: exit 1
       - name: CI not succeeded
+        if: ${{ !cancelled() }}
+        run: exit 1
+      - name: CI not succeeded
+        if: ${{ !success() }}
         run: exit 1

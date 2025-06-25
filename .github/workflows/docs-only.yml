@@ -30,6 +30,8 @@ jobs:
           echo "B: ${{ inputs.base-ref }}"
           echo "K: ${{ inputs.event-name }}"
 
+          exit 128
+
           BASE_SHA=$(git rev-parse origin/${{ inputs.base-ref }})
           CHANGED_FILES=$(git diff --name-only $BASE_SHA HEAD)
           NON_MD_FILES=$(echo "$CHANGED_FILES" | grep -vE '^([^/]+\.md)$' || true)
@@ -39,7 +41,7 @@ jobs:
             exit 0
           fi
 
-          if [ "${{ inputs.event-name }}" = "pull-request" ]
+          if [ "${{ inputs.event-name }}" = "pull-request" ]; then
             echo "docs-only=false" >> $GITHUB_OUTPUT
             exit 0
           fi
