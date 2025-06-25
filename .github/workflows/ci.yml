@@ -27,7 +27,6 @@ jobs:
     uses: ./.github/workflows/k8s.yml
 
   ci:
-    if: ${{ success() }}
     needs:
       - helm-ci
       - k8s-ci

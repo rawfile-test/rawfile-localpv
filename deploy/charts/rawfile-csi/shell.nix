@@ -6,7 +6,7 @@ pkgs.mkShell {
   name = "rawfile-helm-shell";
 
   buildInputs = with pkgs; [
-    helm
+    kubernetes-helm-wrapped
     helm-docs
   ];
 }
