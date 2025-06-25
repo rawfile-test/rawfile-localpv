@@ -44,14 +44,7 @@ jobs:
 
       - id: merge-q
         if: ${{ inputs.event-name == 'merge_group' }}
-        run: |
-          BASE_REF="${{ inputs.base-ref }}"
-
-          if git diff --quiet HEAD~1 origin/${BASE_REF#refs/heads/}; then
-            echo "skip-check=true" >> $GITHUB_OUTPUT
-          else
-            echo "skip-check=false" >> $GITHUB_OUTPUT
-          fi
+        uses: cariad-tech/merge-queue-ci-skipper@main
 
       - id: skip
         run: |
