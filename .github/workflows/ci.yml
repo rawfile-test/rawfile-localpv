@@ -27,7 +27,7 @@ jobs:
     uses: ./.github/workflows/k8s.yml
 
   ci:
-    if: always() && (cancelled() || contains(needs.*.result, 'failure'))
+    if: cancelled() || failure()
     needs:
       - helm-ci
       - k8s-ci
