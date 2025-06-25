@@ -23,7 +23,7 @@ jobs:
 
   k8s-ci:
     needs: skipper
-    if: ${{ needs.skipper.outputs.skip-k8s != 'false' }}
+    if: ${{ needs.skipper.outputs.skip-k8s != 'true' }}
     uses: ./.github/workflows/k8s.yml
 
   ci:
