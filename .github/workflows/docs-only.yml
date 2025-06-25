@@ -54,6 +54,8 @@ jobs:
             echo "skip-check=false" >> $GITHUB_OUTPUT
             echo "N"
           fi
+          git show HEAD~1
+          git show origin/${BASE_REF#refs/heads/}
 
           PAGER= git diff HEAD~1 origin/${BASE_REF#refs/heads/}
           exit 1
