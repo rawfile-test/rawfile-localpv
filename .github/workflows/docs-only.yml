@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
       - id: docs
-        #if: ${{ inputs.event-name == 'pull-request' || inputs.event-name == 'merge-group' }}
+        if: ${{ inputs.event-name == 'pull_request' || inputs.event-name == 'merge_group' }}
         run: |
           echo "B: ${{ inputs.base-ref }}"
           echo "K: ${{ inputs.event-name }}"
@@ -45,7 +45,7 @@ jobs:
           fi
 
       - id: merge-q
-        if: ${{ inputs.event-name == 'merge-group' }}
+        if: ${{ inputs.event-name == 'merge_group' }}
         uses: cariad-tech/merge-queue-ci-skipper@main
         with:
           secret: ${{ secrets.GITHUB_TOKEN }}
@@ -53,11 +53,11 @@ jobs:
       - id: skip
         run: |
           # PR's just follow the docs changes
-          if [ "${{ inputs.event-name }}" = "pull-request" ]; then
+          if [ "${{ inputs.event-name }}" = "pull_request" ]; then
             echo "skip-k8s=${{ steps.docs.outputs.docs-only }}" >> $GITHUB_OUTPUT
             exit 0
           fi
-          if [ "${{ inputs.event-name }}" = "merge-group" ]; then
+          if [ "${{ inputs.event-name }}" = "merge_group" ]; then
             # Otherwise, let's skip only if the tests already passed and we're up to date with base
             echo "skip-k8s=${{ steps.merge-q.outputs.skip-check }}" >> $GITHUB_OUTPUT
             exit 0
