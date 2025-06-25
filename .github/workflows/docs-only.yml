@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
       - id: docs
-        if: ${{ inputs.event-name == 'pull-request' || inputs.event-name == 'merge-group' }}
+        #if: ${{ inputs.event-name == 'pull-request' || inputs.event-name == 'merge-group' }}
         run: |
           echo "B: ${{ inputs.base-ref }}"
           echo "K: ${{ inputs.event-name }}"
