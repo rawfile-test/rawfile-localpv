@@ -22,7 +22,7 @@ jobs:
           driver-opts: |
             network=host
       - name: Pre-populate nix-shell
-        run: nix-shell --run "echo"
+        run: exit 1
       #- name: Build test images
       #  run: nix-shell --run "CI_TEST=true .ci/build.sh"
       #- name: BootStrap k8s cluster
