@@ -1,27 +1,62 @@
-name: Only Docs Modified
+name: K8s Skipper
 on:
   workflow_call:
+    inputs:
+      base-ref:
+        description: "Base of pull-request or merge-group"
+        type: string
+        required: true
+      event-name:
+        description: "The kind of event"
+        type: string
+        required: true
     outputs:
-      docs-only:
+      skip-k8s:
         description: "Whether k8s-ci should run"
-        value: ${{ jobs.check.outputs.docs-only }}
+        value: ${{ jobs.check.outputs.skip-k8s }}
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    if: ${{ inputs.event-name == 'pull-request' || inputs.event-name == 'merge-group' }}
     outputs:
-      docs-only: ${{ steps.changes.outputs.docs-only }}
+      skip-k8s: ${{ steps.skip.outputs.skip-k8s }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - id: changes
+      - id: docs
         run: |
-          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+          echo "B: ${{ inputs.base-ref }}"
+          echo "K: ${{ inputs.event-name }}"
+
+          BASE_SHA=$(git rev-parse origin/${{ inputs.base-ref }})
+          CHANGED_FILES=$(git diff --name-only $BASE_SHA HEAD)
           NON_MD_FILES=$(echo "$CHANGED_FILES" | grep -vE '^([^/]+\.md)$' || true)
 
           if [ -z "$NON_MD_FILES" ]; then
             echo "docs-only=true" >> $GITHUB_OUTPUT
-          else
-            echo "docs-only=false" >> $GITHUB_OUTPUT
+            exit 0
           fi
+
+          if [ "${{ inputs.event-name }}" = "pull-request" ]
+            echo "docs-only=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+      - id: merge-q
+        if: ${{ inputs.event-name == 'merge-group' }}
+        uses: cariad-tech/merge-queue-ci-skipper@main
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: skip
+        run: |
+          # PR's just follow the docs changes
+          if [ "${{ inputs.event-name }}" = "pull-request" ]; then
+            echo "skip-k8s=${{ steps.docs.outputs.docs-only }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Otherwise, let's skip only if the tests already passed and we're up to date with base
+          echo "skip-k8s=${{ steps.merge-q.outputs.skip-check }}" >> $GITHUB_OUTPUT

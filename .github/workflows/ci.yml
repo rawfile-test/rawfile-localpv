@@ -11,30 +11,21 @@ on:
   merge_group:
 
 jobs:
-  changes:
+  skipper:
     uses: ./.github/workflows/docs-only.yml
-  
-  skip:
-    runs-on: ubuntu-latest
-    outputs:
-      skip: ${{ steps.check.outputs.skip-check }}
-    steps:
-      - id: merge-q
-        uses: cariad-tech/merge-queue-ci-skipper@main
-        with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
-      - id: skip
-        run: |
-          echo "Got: ${{ steps.merge-q.outputs.skip-check }}"
+    secrets: inherit
+    with:
+      event: ${{ github.event_name }}
+      base-ref: ${{ github.base_ref || github.event.merge_group.base_ref }}
 
   helm-ci:
-    needs: changes
-    if: ${{ github.event_name != 'pull_request' || needs.changes.outputs.docs-only == 'false' }}
     uses: ./.github/workflows/helm-chart.yml
+
   k8s-ci:
-    needs: changes
-    if: ${{ needs.merge-q.outputs.skip == 'false' && (github.event_name != 'pull_request' || needs.changes.outputs.docs-only == 'false') }}
+    needs: skipper
+    if: ${{ needs.skipper.outputs.skip-k8s != 'false' }}
     uses: ./.github/workflows/k8s.yml
+
   ci:
     if: ${{ success() }}
     needs:
