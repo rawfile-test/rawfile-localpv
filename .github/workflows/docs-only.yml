@@ -54,7 +54,6 @@ jobs:
             exit 0
           fi
           if [ "${{ inputs.event-name }}" = "merge_group" ]; then
-            exit 1
             # Otherwise, let's skip only if the tests already passed and we're up to date with base
             echo "skip-k8s=${{ steps.merge-q.outputs.skip-check }}" >> $GITHUB_OUTPUT
             exit 0
