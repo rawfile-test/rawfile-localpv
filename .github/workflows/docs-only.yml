@@ -64,3 +64,6 @@ jobs:
           fi
           # else (ie push) we run the tests
           echo "skip-k8s=false" >> $GITHUB_OUTPUT
+      - name: skip-k8s?
+        run: |
+          echo "skip-k8s=${{ steps.skip.outputs.skip-k8s }}"

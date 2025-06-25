@@ -2,7 +2,7 @@ name: Container Images
 on:
   push:
     branches:
-      - develop
+      - develops
       - 'release/**'
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+**'
