@@ -54,7 +54,7 @@ jobs:
       - id: skip
         run: |
           echo "skip-k8s=true" >> $GITHUB_OUTPUT
-          exit 1
+          exit 0
           # PR's just follow the docs changes
           if [ "${{ inputs.event-name }}" = "pull_request" ]; then
             echo "skip-k8s=${{ steps.docs.outputs.docs-only }}" >> $GITHUB_OUTPUT
