@@ -14,20 +14,22 @@ jobs:
   changes:
     uses: ./.github/workflows/docs-only.yml
   
-  merge-q:
+  skip:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'merge_group' }}
     outputs:
       skip: ${{ steps.check.outputs.skip-check }}
     steps:
-      - id: check
+      - id: merge-q
         uses: cariad-tech/merge-queue-ci-skipper@main
-      - run: |
-          echo "Got: ${{ steps.check.outputs.skip-check }}"
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+      - id: skip
+        run: |
+          echo "Got: ${{ steps.merge-q.outputs.skip-check }}"
 
   helm-ci:
-    needs: [changes, merge-q]
-    if: ${{ needs.merge-q.outputs.skip == 'false' && (github.event_name != 'pull_request' || needs.changes.outputs.docs-only == 'false') }}
+    needs: changes
+    if: ${{ github.event_name != 'pull_request' || needs.changes.outputs.docs-only == 'false' }}
     uses: ./.github/workflows/helm-chart.yml
   k8s-ci:
     needs: changes
@@ -40,5 +42,5 @@ jobs:
       - k8s-ci
     runs-on: ubuntu-latest
     steps:
-      - name: CI succeeded
-        run: exit 0
+      - name: CI not succeeded
+        run: exit 1
