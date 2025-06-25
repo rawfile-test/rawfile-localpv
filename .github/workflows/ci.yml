@@ -36,8 +36,10 @@ jobs:
       NEEDS_JSON: "${{toJSON(needs)}}"
     runs-on: ubuntu-latest
     steps:
-      - run: |
+      - name: Collect Outcomes
+        run: |
           echo "ALL_SUCCESS=$(echo "$NEEDS_JSON" | jq '. | to_entries | map([.value.result == "success", .value.result == "skipped"] | any) | all')" >>$GITHUB_ENV
-      - run: "[ $ALL_SUCCESS == true ]"
+      - name: Check Outcomes
+        run: "[ $ALL_SUCCESS == true ]"
       - name: CI succeeded
         run: exit 0
