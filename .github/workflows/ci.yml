@@ -23,7 +23,7 @@ jobs:
 
   k8s-ci:
     needs: skipper
-    if: ${{ needs.skipper.outputs.skip-k8s != 'true' }}
+    if: needs.skipper.outputs.skip-k8s != 'true'
     uses: ./.github/workflows/k8s.yml
 
   ci:
@@ -33,12 +33,12 @@ jobs:
       - k8s-ci
     runs-on: ubuntu-latest
     steps:
+      - name: CI failed
+        if: ${{ failure() }}
+        run: exit 1
+      - name: CI cancelled
+        if: ${{ cancelled() }}
+        run: exit 1
       - name: CI succeeded
-        if: ${{ ! failure() && ! cancelled() }}
-        run: exit 1
-      - name: CI not succeeded
-        if: ${{ !cancelled() }}
-        run: exit 1
-      - name: CI not succeeded
-        if: ${{ !success() }}
-        run: exit 1
+        if: ${{ success() }}
+        run: exit 0
