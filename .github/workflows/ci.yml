@@ -23,15 +23,21 @@ jobs:
 
   k8s-ci:
     needs: skipper
-    if: always() && needs.skipper.outputs.skip-k8s != 'true'
+    if: needs.skipper.outputs.skip-k8s != 'true'
     uses: ./.github/workflows/k8s.yml
 
   ci:
-    if: ${{ success() }}
+    if: always()
     needs:
+      - skipper
       - helm-ci
       - k8s-ci
+    env:
+      NEEDS_JSON: "${{toJSON(needs)}}"
     runs-on: ubuntu-latest
     steps:
+      - run: |
+          echo "ALL_SUCCESS=$(echo "$NEEDS_JSON" | jq '. | to_entries | map([.value.result == "success", .value.result == "skipped"] | any) | all')" >>$GITHUB_ENV
+      - run: "[ $ALL_SUCCESS == true ]"
       - name: CI succeeded
         run: exit 0
