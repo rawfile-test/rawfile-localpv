@@ -54,6 +54,8 @@ jobs:
             exit 0
           fi
           if [ "${{ inputs.event-name }}" = "merge_group" ]; then
+            echo "CAN_SKIP_CHECKS is: $CAN_SKIP_CHECKS"
+            exit 1
             if [ "${{ steps.merge-q.outputs.skip-check }}" = "true" ]; then
               echo "skip-k8s=true" >> $GITHUB_OUTPUT
             elif [ "${{ steps.merge-q.outputs.skip-check }}" = "" ] && [ "${{ steps.merge-q.conclusion }}" = "success" ]; then 
