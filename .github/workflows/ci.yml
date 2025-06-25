@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/docs-only.yml
     secrets: inherit
     with:
-      event: ${{ github.event_name }}
+      event-name: ${{ github.event_name }}
       base-ref: ${{ github.base_ref || github.event.merge_group.base_ref }}
 
   helm-ci:
