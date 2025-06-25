@@ -30,6 +30,8 @@ jobs:
           echo "B: ${{ inputs.base-ref }}"
           echo "K: ${{ inputs.event-name }}"
 
+          exit 1
+
           BASE_SHA=$(git rev-parse origin/${{ inputs.base-ref }})
           CHANGED_FILES=$(git diff --name-only $BASE_SHA HEAD)
           NON_MD_FILES=$(echo "$CHANGED_FILES" | grep -vE '^([^/]+\.md)$' || true)
