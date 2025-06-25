@@ -25,13 +25,11 @@ jobs:
         with:
           fetch-depth: 0
       - id: docs
-        #if: ${{ inputs.event-name == 'pull_request' || inputs.event-name == 'merge_group' }}
+        if: ${{ inputs.event-name == 'pull_request' || inputs.event-name == 'merge_group' }}
         run: |
           echo "B: ${{ inputs.base-ref }}"
           echo "K: ${{ inputs.event-name }}"
           
-          exit 1
-
           BASE_REF="${{ inputs.base-ref }}"
           BASE_SHA=$(git rev-parse origin/${BASE_REF#refs/heads/})
           CHANGED_FILES=$(git diff --name-only $BASE_SHA HEAD)
@@ -55,6 +53,8 @@ jobs:
 
       - id: skip
         run: |
+          echo "skip-k8s=true" >> $GITHUB_OUTPUT
+          exit 1
           # PR's just follow the docs changes
           if [ "${{ inputs.event-name }}" = "pull_request" ]; then
             echo "skip-k8s=${{ steps.docs.outputs.docs-only }}" >> $GITHUB_OUTPUT
