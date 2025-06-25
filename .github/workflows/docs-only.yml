@@ -54,8 +54,13 @@ jobs:
             exit 0
           fi
           if [ "${{ inputs.event-name }}" = "merge_group" ]; then
-            # Otherwise, let's skip only if the tests already passed and we're up to date with base
-            echo "skip-k8s=${{ steps.merge-q.outputs.skip-check }}" >> $GITHUB_OUTPUT
+            if [ "${{ steps.merge-q.outputs.skip-check }}" = "true" ]; then
+              echo "skip-k8s=true" >> $GITHUB_OUTPUT
+            elif [ "${{ steps.merge-q.outputs.skip-check }}" = "" ] && [ "${{ steps.merge-q.conclusion }}" = "success" ]; then 
+              echo "skip-k8s=true" >> $GITHUB_OUTPUT
+            else
+              echo "skip-k8s=false" >> $GITHUB_OUTPUT
+            fi
             exit 0
           fi
           # else (ie push) we run the tests
