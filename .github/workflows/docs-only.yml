@@ -44,21 +44,7 @@ jobs:
 
       - id: merge-q
         if: ${{ inputs.event-name == 'merge_group' }}
-        run: |
-          BASE_REF="${{ inputs.base-ref }}"
-
-          if git diff --quiet HEAD~1 origin/${BASE_REF#refs/heads/}; then
-            echo "skip-check=true" >> $GITHUB_OUTPUT
-            echo "Y"
-          else
-            echo "skip-check=false" >> $GITHUB_OUTPUT
-            echo "N"
-          fi
-          git show HEAD~1
-          git show origin/${BASE_REF#refs/heads/}
-
-          PAGER= git diff HEAD~1 origin/${BASE_REF#refs/heads/}
-          exit 1
+        uses: cariad-tech/merge-queue-ci-skipper@main
 
       - id: skip
         run: |
@@ -68,6 +54,7 @@ jobs:
             exit 0
           fi
           if [ "${{ inputs.event-name }}" = "merge_group" ]; then
+            exit 1
             # Otherwise, let's skip only if the tests already passed and we're up to date with base
             echo "skip-k8s=${{ steps.merge-q.outputs.skip-check }}" >> $GITHUB_OUTPUT
             exit 0
