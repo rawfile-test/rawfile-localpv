@@ -49,9 +49,14 @@ jobs:
 
           if git diff --quiet HEAD~1 origin/${BASE_REF#refs/heads/}; then
             echo "skip-check=true" >> $GITHUB_OUTPUT
+            echo "Y"
           else
             echo "skip-check=false" >> $GITHUB_OUTPUT
+            echo "N"
           fi
+
+          PAGER= git diff HEAD~1 origin/${BASE_REF#refs/heads/}
+          exit 1
 
       - id: skip
         run: |
