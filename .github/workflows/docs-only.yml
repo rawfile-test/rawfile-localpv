@@ -18,7 +18,6 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    if: ${{ inputs.event-name == 'pull-request' || inputs.event-name == 'merge-group' }}
     outputs:
       skip-k8s: ${{ steps.skip.outputs.skip-k8s }}
     steps:
@@ -58,5 +57,10 @@ jobs:
             exit 0
           fi
 
-          # Otherwise, let's skip only if the tests already passed and we're up to date with base
-          echo "skip-k8s=${{ steps.merge-q.outputs.skip-check }}" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.event-name }}" = "merge-group" ]; then
+            # Otherwise, let's skip only if the tests already passed and we're up to date with base
+            echo "skip-k8s=${{ steps.merge-q.outputs.skip-check }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          # else (ie push) we run the tests
+          echo "skip-k8s=false" >> $GITHUB_OUTPUT
