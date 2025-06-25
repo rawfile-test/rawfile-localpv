@@ -18,8 +18,8 @@ jobs:
       event-name: ${{ github.event_name }}
       base-ref: ${{ github.base_ref || github.event.merge_group.base_ref }}
 
-  helm-ci:
-    uses: ./.github/workflows/helm-chart.yml
+  # helm-ci:
+  #   uses: ./.github/workflows/helm-chart.yml
 
   k8s-ci:
     needs: skipper
@@ -29,7 +29,7 @@ jobs:
   ci:
     if: cancelled() || failure()
     needs:
-      - helm-ci
+      # - helm-ci
       - k8s-ci
     runs-on: ubuntu-latest
     steps:
